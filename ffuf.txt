@@ -1,0 +1,81 @@
+1. Базовый запуск фуззинга URL
+
+ffuf -w /path/to/wordlist.txt -u http://target/FUZZ
+
+    -w — путь к словарю
+
+    -u — URL с местом для подстановки (FUZZ — маркер)
+
+2. Фуззинг параметров GET
+
+ffuf -w /path/to/wordlist.txt -u http://target/page.php?id=FUZZ
+
+3. Фуззинг POST-параметров
+
+ffuf -w /path/to/wordlist.txt -u http://target/login.php -X POST -d "username=admin&password=FUZZ"
+
+    -X POST — метод POST
+
+    -d — данные запроса с параметром FUZZ
+
+4. Фильтрация по коду ответа (например, искать только 200)
+
+ffuf -w wordlist.txt -u http://target/FUZZ -mc 200
+
+    -mc — match code (код ответа)
+
+5. Фильтрация по длине ответа (например, исключить длину 0)
+
+ffuf -w wordlist.txt -u http://target/FUZZ -ml 100
+
+    -ml — минимальная длина
+
+6. Игнорировать определённые коды (например, 404)
+
+ffuf -w wordlist.txt -u http://target/FUZZ -fc 404
+
+    -fc — фильтр по коду (код исключается)
+
+7. Фуззинг с использованием нескольких словарей (например, для пути и параметра)
+
+ffuf -w dirlist.txt:FUZZ -w paramlist.txt:PARAM -u http://target/FUZZ.php?test=PARAM
+
+8. Установка таймаута (по умолчанию 10 секунд)
+
+ffuf -w wordlist.txt -u http://target/FUZZ -t 50 -timeout 5
+
+    -t — количество потоков
+
+    -timeout — таймаут в секундах
+
+9. Запись результата в файл
+
+ffuf -w wordlist.txt -u http://target/FUZZ -o result.json -of json
+
+    -o — имя файла вывода
+
+    -of — формат вывода (json, html, md, csv)
+
+10. Использование HTTP-заголовков (например, подставить токен)
+
+ffuf -w wordlist.txt -u http://target/FUZZ -H "Authorization: Bearer your_token"
+
+11. Пример фуззинга директорий с фильтрацией по статусу и длине
+
+ffuf -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://target/FUZZ -mc 200,301,302 -ml 100
+
+Как читать вывод:
+
+    В колонках:
+
+        Status — HTTP статус (200, 403, 404 и т.п.)
+
+        Size — длина тела ответа (полезно фильтровать по длине, чтобы отсеять 404 страницы с шаблонным содержимым)
+
+        Words — количество слов в ответе
+
+        Lines — количество строк
+
+        URL — найденный путь или параметр
+
+    Идея — искать ответы с "правильным" статусом и длиной, которые отличаются от ошибки (404 и пустых страниц).
